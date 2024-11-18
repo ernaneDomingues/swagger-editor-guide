@@ -1,0 +1,204 @@
+openapi: 3.1.0
+info:
+  title: Vehicle Registration API
+  description: |
+    This API allows users to:
+    - Register vehicles.
+    - Retrieve all registered vehicles.
+    - Query vehicles by ID or manufacturer.
+    - Register manufacturers and models.
+    - Update and delete vehicles.
+  version: 1.0.0
+  termsOfService: https://www.example.com/terms
+  contact:
+    name: API Support Team
+    email: support@example.com
+  license:
+    name: GPL-3.0
+    url: https://www.gnu.org/licenses/gpl-3.0.html
+externalDocs:
+  description: API Documentation
+  url: https://www.example.com/doc
+servers:
+  - url: https://67391350a3a36b5a62ede4e1.mockapi.io/
+    description: Mock Server for Testing
+tags:
+  - name: Vehicles
+    description: Endpoints related to vehicle management.
+paths:
+  /vehicles:
+    get:
+      summary: Retrieve all registered vehicles
+      operationId: getVehicles
+      tags:
+        - Vehicles
+      responses:
+        200:
+          description: List of vehicles retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicles"
+              examples:
+                success:
+                  value:
+                    - id: 1
+                      manufacturers: "Toyota"
+                      model: "Corolla"
+                      engine: "2.0L"
+                      power: "150hp"
+                      category: "Sedan"
+                      year: "2023"
+        500:
+          description: Server error.
+          content:
+            application/json:
+              example: {"error": "Internal Server Error"}
+    post:
+      summary: Create a new vehicle
+      operationId: createVehicle
+      tags:
+        - Vehicles
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Vehicle"
+            examples:
+              newVehicle:
+                value:
+                  manufacturers: "Honda"
+                  model: "Civic"
+                  engine: "1.8L"
+                  power: "140hp"
+                  category: "Sedan"
+                  year: "2022"
+      responses:
+        201:
+          description: Vehicle created successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicle"
+        400:
+          description: Invalid input data.
+          content:
+            application/json:
+              example: {"error": "Invalid request body."}
+      security:
+        - auth: []
+  /vehicles/{id}:
+    get:
+      summary: Retrieve a vehicle by ID
+      operationId: getVehicleById
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the vehicle to retrieve.
+      responses:
+        200:
+          description: Vehicle retrieved successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicle"
+        404:
+          description: Vehicle not found.
+          content:
+            application/json:
+              example: {"error": "Vehicle with ID 123 not found."}
+    put:
+      summary: Update a vehicle
+      operationId: updateVehicle
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the vehicle to update.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Vehicle"
+      responses:
+        200:
+          description: Vehicle updated successfully.
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Vehicle"
+        404:
+          description: Vehicle not found.
+          content:
+            application/json:
+              example: {"error": "Vehicle with ID 123 not found."}
+      security:
+        - auth: []
+    delete:
+      summary: Delete a vehicle
+      operationId: deleteVehicle
+      tags:
+        - Vehicles
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: ID of the vehicle to delete.
+      responses:
+        204:
+          description: Vehicle deleted successfully.
+        404:
+          description: Vehicle not found.
+          content:
+            application/json:
+              example: {"error": "Vehicle with ID 123 not found."}
+      security:
+        - auth: []
+components:
+  schemas:
+    Vehicle:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        manufacturers:
+          type: string
+          example: "Toyota"
+        model:
+          type: string
+          example: "Corolla"
+        engine:
+          type: string
+          example: "2.0L"
+        power:
+          type: string
+          example: "150hp"
+        category:
+          type: string
+          example: "Sedan"
+        year:
+          type: string
+          example: "2023"
+    Vehicles:
+      type: array
+      items:
+        $ref: "#/components/schemas/Vehicle"
+  securitySchemes:
+    auth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
